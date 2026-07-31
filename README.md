@@ -39,7 +39,7 @@ HopePath was created as a personal initiative to provide a small moment of hope 
 
 ## 🤝 Contributing
 
-Suggestions and feedback are always welcome. Feel free to open an issue or submit a pull request.
+Suggestions and feedback are always welcome. 
 
 ---
 
