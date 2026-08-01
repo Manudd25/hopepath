@@ -5,23 +5,18 @@ import {
   saveJournalEntry,
   deleteJournalEntry,
 } from '../services/journalService'
-import { isFirebaseConfigured } from '../lib/firebase'
+
 export function useJournal() {
   const { user, firebaseReady, loading: authLoading } = useFirebase()
   const [entries, setEntries] = useState([])
-  const [loading, setLoading] = useState(isFirebaseConfigured())
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   const loadEntries = useCallback(async () => {
-    if (!isFirebaseConfigured()) {
-      setEntries([])
-      setError('Journal is unavailable — Firebase is not configured.')
-      setLoading(false)
-      return
-    }
-
     if (!firebaseReady || !user) {
-      setLoading(authLoading)
+      if (!authLoading) {
+        setLoading(false)
+      }
       return
     }
 

@@ -10,6 +10,7 @@ const navLinks = [
   { to: '/journal', label: 'Journal' },
   { to: '/peace-corner', label: 'Peace Corner' },
   { to: '/resources', label: 'Resources' },
+  { to: '/hope-assistant', label: 'Hope AI' },
   { to: '/about', label: 'About' },
 ]
 

@@ -10,6 +10,7 @@ import Journal from './pages/Journal'
 import PeaceCorner from './pages/PeaceCorner'
 import Resources from './pages/Resources'
 import About from './pages/About'
+import HopeAssistant from './pages/HopeAssistant'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="journal" element={<Journal />} />
           <Route path="peace-corner" element={<PeaceCorner />} />
           <Route path="resources" element={<Resources />} />
+          <Route path="hope-assistant" element={<HopeAssistant />} />
           <Route path="about" element={<About />} />
         </Route>
       </Routes>

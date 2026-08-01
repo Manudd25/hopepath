@@ -7,10 +7,10 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore'
-import { db } from '../lib/firebase'
+import { getFirebaseDb } from '../lib/firebase'
 
 function journalRef(userId) {
-  return collection(db, 'users', userId, 'journal')
+  return collection(getFirebaseDb(), 'users', userId, 'journal')
 }
 
 export async function fetchJournalEntries(userId) {
@@ -21,7 +21,7 @@ export async function fetchJournalEntries(userId) {
 
 export async function saveJournalEntry(userId, entry) {
   const id = entry.id?.toString() || `entry-${Date.now()}`
-  const ref = doc(db, 'users', userId, 'journal', id)
+  const ref = doc(getFirebaseDb(), 'users', userId, 'journal', id)
   await setDoc(ref, {
     fear: entry.fear || '',
     gratitude: entry.gratitude || '',
@@ -33,7 +33,7 @@ export async function saveJournalEntry(userId, entry) {
 }
 
 export async function deleteJournalEntry(userId, entryId) {
-  await deleteDoc(doc(db, 'users', userId, 'journal', entryId))
+  await deleteDoc(doc(getFirebaseDb(), 'users', userId, 'journal', entryId))
 }
 
 export async function migrateLocalJournal(userId, localEntries) {

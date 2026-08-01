@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import SectionTitle from '../components/SectionTitle'
-import { sendHopeMessage } from '../services/gemini'
+import { sendHopeMessage } from '../services/hopeAssistant'
 
 const STARTER = {
   role: 'assistant',

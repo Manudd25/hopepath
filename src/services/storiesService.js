@@ -5,7 +5,7 @@ import {
   setDoc,
   deleteDoc,
 } from 'firebase/firestore'
-import { db } from '../lib/firebase'
+import { getFirebaseDb } from '../lib/firebase'
 import { stories as fallbackStories } from '../data/stories'
 
 function mapStoryDoc(id, data) {
@@ -45,7 +45,7 @@ function storyKey(story) {
 export async function fetchStories(currentUserId = null) {
   const builtIn = builtInStories()
 
-  const snap = await getDocs(collection(db, 'stories'))
+  const snap = await getDocs(collection(getFirebaseDb(), 'stories'))
 
   const fromFirestore = snap.docs
     .map((d) => mapStoryDoc(d.id, d.data()))
@@ -71,7 +71,7 @@ export async function fetchStories(currentUserId = null) {
 
 export async function createStory(userId, story) {
   const id = `story-${Date.now()}`
-  const ref = doc(db, 'stories', id)
+  const ref = doc(getFirebaseDb(), 'stories', id)
   const now = new Date().toISOString()
   await setDoc(ref, {
     name: story.name.trim() || 'Anonymous',
@@ -88,7 +88,7 @@ export async function createStory(userId, story) {
 }
 
 export async function updateStory(storyId, story) {
-  const ref = doc(db, 'stories', storyId)
+  const ref = doc(getFirebaseDb(), 'stories', storyId)
   const now = new Date().toISOString()
   await setDoc(
     ref,
@@ -105,7 +105,7 @@ export async function updateStory(storyId, story) {
 }
 
 export async function deleteStory(storyId) {
-  await deleteDoc(doc(db, 'stories', storyId))
+  await deleteDoc(doc(getFirebaseDb(), 'stories', storyId))
 }
 
 export async function migrateLocalStories(userId, localStories) {

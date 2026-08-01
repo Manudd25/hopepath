@@ -6,23 +6,20 @@ import {
   deleteStory,
   getBuiltInStoriesOnly,
 } from '../services/storiesService'
-import { isFirebaseConfigured } from '../lib/firebase'
 import { useFirebase } from '../context/FirebaseContext'
+
 export function useStories() {
   const { user, firebaseReady, loading: authLoading } = useFirebase()
   const [stories, setStories] = useState(getBuiltInStoriesOnly)
-  const [loading, setLoading] = useState(isFirebaseConfigured())
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   const loadStories = useCallback(async () => {
-    if (!isFirebaseConfigured()) {
-      setStories(getBuiltInStoriesOnly())
-      setLoading(false)
-      return
-    }
-
     if (!firebaseReady || !user) {
-      setLoading(authLoading)
+      if (!authLoading) {
+        setStories(getBuiltInStoriesOnly())
+        setLoading(false)
+      }
       return
     }
 
@@ -68,6 +65,6 @@ export function useStories() {
     saveStory,
     removeStory,
     refresh: loadStories,
-    canSubmit: isFirebaseConfigured() && firebaseReady,
+    canSubmit: firebaseReady,
   }
 }

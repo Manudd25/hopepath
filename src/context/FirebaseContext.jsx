@@ -1,6 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth'
-import { auth, isFirebaseConfigured } from '../lib/firebase'
+import {
+  initFirebase,
+  isFirebaseConfigured,
+  getFirebaseAuth,
+} from '../lib/firebase'
+import { loadPublicConfig } from '../lib/publicConfig'
+import { initAnalytics } from '../lib/analytics'
 import { seedStoriesIfEmpty } from '../lib/seedFirestore'
 import { runLegacyMigration } from '../lib/legacyStorage'
 
@@ -9,50 +15,69 @@ const FirebaseContext = createContext({
   loading: true,
   firebaseReady: false,
   authError: null,
+  configError: null,
 })
 
 export function FirebaseProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(isFirebaseConfigured())
+  const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState(null)
+  const [configError, setConfigError] = useState(null)
 
   useEffect(() => {
-    if (!isFirebaseConfigured() || !auth) {
-      setLoading(false)
-      return
+    let unsubscribe = () => {}
+
+    async function bootstrap() {
+      try {
+        const config = await loadPublicConfig()
+        initAnalytics(config.gaMeasurementId)
+        await initFirebase(config)
+
+        if (!isFirebaseConfigured()) {
+          setLoading(false)
+          return
+        }
+
+        const auth = getFirebaseAuth()
+
+        unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+          if (currentUser) {
+            setUser(currentUser)
+            setLoading(false)
+            try {
+              await runLegacyMigration(currentUser.uid)
+              await seedStoriesIfEmpty(config.seedFirestore)
+            } catch {
+              // optional
+            }
+            return
+          }
+
+          try {
+            const credential = await signInAnonymously(auth)
+            setUser(credential.user)
+            setAuthError(null)
+            try {
+              await runLegacyMigration(credential.user.uid)
+              await seedStoriesIfEmpty(config.seedFirestore)
+            } catch {
+              // optional
+            }
+          } catch (err) {
+            setAuthError(err.message)
+          } finally {
+            setLoading(false)
+          }
+        })
+      } catch (err) {
+        setConfigError(err.message)
+        setLoading(false)
+      }
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser)
-        setLoading(false)
-        try {
-          await runLegacyMigration(currentUser.uid)
-          await seedStoriesIfEmpty()
-        } catch {
-          // seed / migration are optional
-        }
-        return
-      }
+    bootstrap()
 
-      try {
-        const credential = await signInAnonymously(auth)
-        setUser(credential.user)
-        setAuthError(null)
-        try {
-          await runLegacyMigration(credential.user.uid)
-          await seedStoriesIfEmpty()
-        } catch {
-          // seed / migration are optional
-        }
-      } catch (err) {
-        setAuthError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    })
-
-    return unsubscribe
+    return () => unsubscribe()
   }, [])
 
   return (
@@ -62,6 +87,7 @@ export function FirebaseProvider({ children }) {
         loading,
         firebaseReady: isFirebaseConfigured() && !loading && Boolean(user),
         authError,
+        configError,
       }}
     >
       {children}
