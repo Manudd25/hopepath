@@ -2,9 +2,38 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Hope Journal — private to each user
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isValidJournalEntry(data) {
+      return data.keys().hasAll(['fear', 'gratitude', 'tomorrowGoal', 'entryDate', 'createdAt', 'updatedAt'])
+        && data.fear is string
+        && data.gratitude is string
+        && data.tomorrowGoal is string
+        && data.entryDate is string
+        && data.entryDate.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && data.fear.size() <= 2000
+        && data.gratitude.size() <= 1000
+        && data.tomorrowGoal.size() <= 500
+        && (!('localEntryId' in data) || data.localEntryId == null || data.localEntryId is string);
+    }
+
+    // Hope Journal — private journal entries per authenticated user
+    match /users/{userId}/journalEntries/{entryId} {
+      allow read, delete: if isOwner(userId);
+
+      allow create: if isOwner(userId) && isValidJournalEntry(request.resource.data);
+
+      allow update: if isOwner(userId)
+        && isValidJournalEntry(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // Legacy journal path — keep read/delete for existing data
     match /users/{userId}/journal/{entryId} {
-      allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId);
     }
 
     // Community stories — anyone can read; only the author can edit or delete their own

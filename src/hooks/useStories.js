@@ -6,16 +6,18 @@ import {
   deleteStory,
   getBuiltInStoriesOnly,
 } from '../services/storiesService'
+import { useAuth } from '../context/AuthContext'
 import { useFirebase } from '../context/FirebaseContext'
 
 export function useStories() {
-  const { user, firebaseReady, loading: authLoading } = useFirebase()
+  const { user, isAuthenticated, authLoading } = useAuth()
+  const { firebaseReady } = useFirebase()
   const [stories, setStories] = useState(getBuiltInStoriesOnly)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   const loadStories = useCallback(async () => {
-    if (!firebaseReady || !user) {
+    if (!firebaseReady) {
       if (!authLoading) {
         setStories(getBuiltInStoriesOnly())
         setLoading(false)
@@ -26,14 +28,14 @@ export function useStories() {
     setLoading(true)
     setError(null)
     try {
-      setStories(await fetchStories(user.uid))
+      setStories(await fetchStories(user?.uid))
     } catch (err) {
       setError(err.message)
       setStories(getBuiltInStoriesOnly())
     } finally {
       setLoading(false)
     }
-  }, [firebaseReady, user, authLoading])
+  }, [firebaseReady, user?.uid, authLoading])
 
   useEffect(() => {
     if (authLoading) return
@@ -65,6 +67,6 @@ export function useStories() {
     saveStory,
     removeStory,
     refresh: loadStories,
-    canSubmit: firebaseReady,
+    canSubmit: isAuthenticated && firebaseReady,
   }
 }

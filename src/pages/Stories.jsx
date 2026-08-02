@@ -3,11 +3,11 @@ import SectionTitle from '../components/SectionTitle'
 import StoryForm from '../components/StoryForm'
 import StoryCard from '../components/StoryCard'
 import { useStories } from '../hooks/useStories'
-import { useFirebase } from '../context/FirebaseContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function Stories() {
   const { stories, loading, error, saveStory, removeStory, canSubmit } = useStories()
-  const { authError, loading: authLoading } = useFirebase()
+  const { authError, openAuthModal, authLoading } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [editingStory, setEditingStory] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
@@ -63,14 +63,25 @@ export default function Stories() {
           <StoryForm onSubmit={handleCreate} onCancel={() => setShowForm(false)} />
         ) : (
           <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setShowForm(true)}
-              disabled={authLoading || !canSubmit}
-              className="px-8 py-3 rounded-full bg-gold text-navy font-medium hover:bg-gold/90 transition-colors disabled:opacity-50"
-            >
-              {authLoading ? 'Connecting…' : 'Share your story'}
-            </button>
+            {canSubmit ? (
+              <button
+                type="button"
+                onClick={() => setShowForm(true)}
+                disabled={authLoading}
+                className="px-8 py-3 rounded-full bg-gold text-navy font-medium hover:bg-gold/90 transition-colors disabled:opacity-50"
+              >
+                Share your story
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={openAuthModal}
+                disabled={authLoading}
+                className="px-8 py-3 rounded-full bg-gold text-navy font-medium hover:bg-gold/90 transition-colors disabled:opacity-50"
+              >
+                Sign in to share your story
+              </button>
+            )}
             <p className="mt-3 text-xs text-navy/50">
               Only you can edit or delete stories you submit.
             </p>
