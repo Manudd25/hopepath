@@ -23,3 +23,13 @@ export function trackPageView(path) {
     page: path,
   })
 }
+
+export function trackFeelingsInteraction(interactionType) {
+  if (!gaId || !initialized) return
+
+  ReactGA.event({
+    category: 'Feelings',
+    action: 'feelings_interaction',
+    label: interactionType,
+  })
+}

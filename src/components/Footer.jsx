@@ -38,12 +38,12 @@ export default function Footer() {
             <p className="text-sm text-navy/70 leading-relaxed">
               Questions or technical issues? We&apos;re here to help.
             </p>
-            <a
-              href="mailto:didariomanuela@gmail.com"
+            <Link
+              to="/about#contact"
               className="inline-block mt-3 text-sm text-gold hover:underline"
             >
-              info@hopepath.net
-            </a>
+              Send a message
+            </Link>
           </section>
         </div>
 

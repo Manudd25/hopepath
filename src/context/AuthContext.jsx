@@ -12,6 +12,7 @@ import {
   getAuthErrorMessage,
 } from '../services/authService'
 import { migrateLocalEntriesToFirestore } from '../services/journalMigrationService'
+import { migrateLocalSmallStepsToFirestore } from '../services/smallStepsMigrationService'
 import { runLegacyStoryMigration } from '../lib/legacyStorage'
 
 const AuthContext = createContext({
@@ -77,6 +78,7 @@ export function AuthProvider({ children }) {
         setShowLogoutPrompt(false)
         try {
           await migrateLocalEntriesToFirestore(currentUser.uid)
+          await migrateLocalSmallStepsToFirestore(currentUser.uid)
           await runLegacyStoryMigration(currentUser.uid)
         } catch {
           // migration runs again on next sign-in

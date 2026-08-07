@@ -15,6 +15,10 @@ export default function Feelings() {
           <EmotionCard key={emotion.id} id={emotion.id} label={emotion.label} />
         ))}
       </div>
+      <p className="mt-12 text-center text-sm text-navy/50 max-w-xl mx-auto leading-relaxed">
+        HopePath is inspired by Christian faith and open to everyone. You don&apos;t need to share
+        our beliefs to find a quiet place here.
+      </p>
     </section>
   )
 }

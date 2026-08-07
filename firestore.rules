@@ -19,6 +19,18 @@ service cloud.firestore {
         && (!('localEntryId' in data) || data.localEntryId == null || data.localEntryId is string);
     }
 
+    function isValidSmallStep(data) {
+      return data.keys().hasAll(['stepId', 'text', 'category', 'date', 'completed', 'createdAt', 'updatedAt'])
+        && data.stepId is string
+        && data.text is string
+        && data.text.size() <= 500
+        && data.category is string
+        && data.date is string
+        && data.date.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && data.completed is bool
+        && (!('completedAt' in data) || data.completedAt == null || data.completedAt is timestamp);
+    }
+
     // Hope Journal — private journal entries per authenticated user
     match /users/{userId}/journalEntries/{entryId} {
       allow read, delete: if isOwner(userId);
@@ -27,6 +39,17 @@ service cloud.firestore {
 
       allow update: if isOwner(userId)
         && isValidJournalEntry(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // Small Steps — one step per day per authenticated user
+    match /users/{userId}/smallSteps/{date} {
+      allow read, delete: if isOwner(userId);
+
+      allow create: if isOwner(userId) && isValidSmallStep(request.resource.data);
+
+      allow update: if isOwner(userId)
+        && isValidSmallStep(request.resource.data)
         && request.resource.data.createdAt == resource.data.createdAt;
     }
 

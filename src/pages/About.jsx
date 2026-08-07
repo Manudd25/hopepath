@@ -1,4 +1,5 @@
 import Button from '../components/Button'
+import ContactForm from '../components/ContactForm'
 import SectionTitle from '../components/SectionTitle'
 
 export default function About() {
@@ -42,17 +43,14 @@ export default function About() {
         </div>
       </div>
 
-      <div className="mt-12 rounded-2xl bg-sand/40 border border-sand p-6 text-center">
-        <p className="font-display text-lg text-navy">Get in touch</p>
-        <p className="text-sm text-navy/70 mt-2">
+      <div id="contact" className="mt-12 rounded-2xl bg-sand/40 border border-sand p-6 md:p-8">
+        <p className="font-display text-lg text-navy text-center">Get in touch</p>
+        <p className="text-sm text-navy/70 mt-2 text-center">
           For questions, feedback, or technical help:
         </p>
-        <a
-          href="mailto:didariomanuela@gmail.com"
-          className="inline-block mt-3 text-gold hover:underline"
-        >
-          info@hopepath.net
-        </a>
+        <div className="mt-6">
+          <ContactForm />
+        </div>
       </div>
 
       <div className="mt-8 text-center">

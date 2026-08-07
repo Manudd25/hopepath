@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import JournalInfoCard from '../components/JournalInfoCard'
 import JournalWriteForm from '../components/JournalWriteForm'
@@ -25,6 +26,8 @@ function sortEntriesOldestFirst(entries) {
 
 export default function Journal() {
   const { user } = useAuth()
+  const location = useLocation()
+  const fromFeelings = location.state?.fromFeelings === true
   const {
     entries,
     loading,
@@ -285,6 +288,11 @@ export default function Journal() {
 
   return (
     <section className="max-w-6xl mx-auto min-h-[70vh] px-4 sm:px-6 py-10 md:py-16">
+      {fromFeelings && (
+        <p className="mb-6 text-center text-sm text-navy/60 max-w-md mx-auto leading-relaxed">
+          Take your time. Write only what feels right — there is no wrong way to begin.
+        </p>
+      )}
       <VirtualNotebook
         loading={loading}
         isOpen={notebookOpen}

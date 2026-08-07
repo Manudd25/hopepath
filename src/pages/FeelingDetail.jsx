@@ -1,5 +1,5 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
-import Button from '../components/Button'
+import FeelingJourney from '../components/FeelingJourney'
 import { emotions } from '../data/emotions'
 
 export default function FeelingDetail() {
@@ -12,7 +12,7 @@ export default function FeelingDetail() {
     <article className="max-w-2xl mx-auto px-4 sm:px-6 py-12 md:py-16">
       <Link
         to="/feelings"
-        className="text-sm text-navy/60 hover:text-gold transition-colors"
+        className="text-sm text-navy/60 hover:text-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded"
       >
         ← Back to feelings
       </Link>
@@ -24,37 +24,7 @@ export default function FeelingDetail() {
         </h1>
       </header>
 
-      <div className="mt-10 space-y-8">
-        <section className="rounded-2xl bg-sand/50 p-6 border border-sand">
-          <h2 className="text-xs font-medium text-gold uppercase tracking-wide">Verse</h2>
-          <p className="font-display text-xl text-navy mt-2">{emotion.verse}</p>
-          <p className="mt-3 text-navy/80 italic leading-relaxed">{emotion.verseText}</p>
-        </section>
-
-        <section>
-          <h2 className="text-xs font-medium text-sage uppercase tracking-wide">Reflection</h2>
-          <p className="mt-3 text-navy leading-relaxed">{emotion.reflection}</p>
-        </section>
-
-        <section className="rounded-2xl bg-rose/30 p-6 border border-rose/50">
-          <h2 className="text-xs font-medium text-navy/60 uppercase tracking-wide">Prayer</h2>
-          <p className="mt-3 text-navy italic leading-relaxed">&ldquo;{emotion.prayer}&rdquo;</p>
-        </section>
-
-        <section className="rounded-2xl bg-sage/20 p-6 border border-sage/40">
-          <h2 className="text-xs font-medium text-navy/60 uppercase tracking-wide">One small step</h2>
-          <p className="mt-3 text-navy font-medium">{emotion.smallStep}</p>
-        </section>
-      </div>
-
-      <div className="mt-12 flex flex-wrap gap-4">
-        <Button to="/peace-corner" variant="secondary">
-          Visit Peace Corner
-        </Button>
-        <Button to="/daily-prayer" variant="outline">
-          Today&apos;s Prayer
-        </Button>
-      </div>
+      <FeelingJourney emotion={emotion} />
     </article>
   )
 }
